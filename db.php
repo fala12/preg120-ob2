@@ -7,7 +7,7 @@ $database = "faala0678";
 
 $conn = new mysqli($host, $username, $password, $database);
 if ($conn->connect_error) {
-  die("Tilkoblingsfeil: " . $conn->connect_error);
+  die("Tilkoblingsfeil: " . htmlspecialchars($conn->connect_error));
 }
 ?>
 
