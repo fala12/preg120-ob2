@@ -1,44 +1,44 @@
 
 <?php include "db.php"; ?>
-<!DOCTYPE html>
-<html lang="no">
-<head>
-  <meta charset="UTF-8">
-  <title>Registrer student</title>
-</head>
-<body>
-<h2>Registrer ny student</h2>
-<?php
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $bn = $_POST["brukernavn"];
-  $fn = $_POST["fornavn"];
-  $en = $_POST["etternavn"];
-  $kk = $_POST["klassekode"];
+<!doctype html><meta charset="utf-8"><title>Registrer student</title>
+<h2>Registrer student</h2>
 
-  if (!$bn || !$fn || !$en || !$kk) {
-    echo "<p style='color:red;'>Fyll ut alle felt!</p>";
+<?php
+if ($_SERVER['REQUEST_METHOD']==='POST') {
+  $bn = trim($_POST['brukernavn'] ?? '');
+  $fn = trim($_POST['fornavn'] ?? '');
+  $en = trim($_POST['etternavn'] ?? '');
+  $kk = trim($_POST['klassekode'] ?? '');
+
+  if ($bn==='' || $fn==='' || $en==='' || $kk==='') {
+    echo "<p style='color:red'>Fyll ut alle felt.</p>";
   } else {
-    $sjekk = $conn->prepare("SELECT 1 FROM student WHERE brukernavn=?");
-    $sjekk->bind_param("s", $bn);
-    $sjekk->execute(); $sjekk->store_result();
-    if ($sjekk->num_rows > 0) {
-      echo "<p style='color:orange;'>Denne studenten finnes allerede.</p>";
+    $s=$conn->prepare("SELECT 1 FROM student WHERE brukernavn=?");
+    $s->bind_param("s",$bn); $s->execute(); $s->store_result();
+    if ($s->num_rows>0) {
+      echo "<p style='color:orange'>Studenten finnes allerede.</p>";
     } else {
-      $stmt = $conn->prepare("INSERT INTO student VALUES (?,?,?,?)");
-      $stmt->bind_param("ssss", $bn, $fn, $en, $kk);
-      $stmt->execute();
-      echo "<p style='color:green;'>Studenten ble registrert!</p>";
+      // valgfritt: sjekk at klasse eksisterer
+      $k=$conn->prepare("SELECT 1 FROM klasse WHERE klassekode=?");
+      $k->bind_param("s",$kk); $k->execute(); $k->store_result();
+      if ($k->num_rows===0) {
+        echo "<p style='color:red'>Klassen finnes ikke.</p>";
+      } else {
+        $i=$conn->prepare("INSERT INTO student(brukernavn,fornavn,etternavn,klassekode) VALUES(?,?,?,?)");
+        $i->bind_param("ssss",$bn,$fn,$en,$kk); $i->execute();
+        echo "<p style='color:green'>Studenten ble registrert.</p>";
+      }
     }
   }
 }
 ?>
+
 <form method="post">
-  Brukernavn: <input type="text" name="brukernavn"><br>
-  Fornavn: <input type="text" name="fornavn"><br>
-  Etternavn: <input type="text" name="etternavn"><br>
-  Klassekode: <input type="text" name="klassekode"><br>
-  <button type="submit">Registrer</button>
+  Brukernavn: <input name="brukernavn"><br>
+  Fornavn: <input name="fornavn"><br>
+  Etternavn: <input name="etternavn"><br>
+  Klassekode: <input name="klassekode"><br>
+  <button>Registrer</button>
 </form>
+
 <p><a href="index.php">Tilbake</a></p>
-</body>
-</html>

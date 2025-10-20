@@ -1,42 +1,34 @@
-
 <?php include "db.php"; ?>
-<!DOCTYPE html>
-<html lang="no">
-<head>
-  <meta charset="UTF-8">
-  <title>Registrer klasse</title>
-</head>
-<body>
-<h2>Registrer ny klasse</h2>
-<?php
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $kode = $_POST["klassekode"];
-  $navn = $_POST["klassenavn"];
-  $studium = $_POST["studiumkode"];
+<!doctype html><meta charset="utf-8"><title>Registrer klasse</title>
+<h2>Registrer klasse</h2>
 
-  if (!$kode || !$navn || !$studium) {
-    echo "<p style='color:red;'>Fyll ut alle felt!</p>";
+<?php
+if ($_SERVER['REQUEST_METHOD']==='POST') {
+  $kode = trim($_POST['klassekode'] ?? '');
+  $navn = trim($_POST['klassenavn'] ?? '');
+  $stud = trim($_POST['studiumkode'] ?? '');
+
+  if ($kode==='' || $navn==='' || $stud==='') {
+    echo "<p style='color:red'>Fyll ut alle felt.</p>";
   } else {
-    $sjekk = $conn->prepare("SELECT 1 FROM klasse WHERE klassekode=?");
-    $sjekk->bind_param("s", $kode);
-    $sjekk->execute(); $sjekk->store_result();
-    if ($sjekk->num_rows > 0) {
-      echo "<p style='color:orange;'>Denne klassen finnes allerede.</p>";
+    $s=$conn->prepare("SELECT 1 FROM klasse WHERE klassekode=?");
+    $s->bind_param("s",$kode); $s->execute(); $s->store_result();
+    if ($s->num_rows>0) {
+      echo "<p style='color:orange'>Klassen finnes allerede.</p>";
     } else {
-      $stmt = $conn->prepare("INSERT INTO klasse VALUES (?,?,?)");
-      $stmt->bind_param("sss", $kode, $navn, $studium);
-      $stmt->execute();
-      echo "<p style='color:green;'>Klassen ble registrert!</p>";
+      $i=$conn->prepare("INSERT INTO klasse(klassekode,klassenavn,studiumkode) VALUES(?,?,?)");
+      $i->bind_param("sss",$kode,$navn,$stud); $i->execute();
+      echo "<p style='color:green'>Klassen ble registrert.</p>";
     }
   }
 }
 ?>
+
 <form method="post">
-  Klassekode: <input type="text" name="klassekode"><br>
-  Klassenavn: <input type="text" name="klassenavn"><br>
-  Studiumkode: <input type="text" name="studiumkode"><br>
-  <button type="submit">Registrer</button>
+  Klassekode: <input name="klassekode"><br>
+  Klassenavn: <input name="klassenavn"><br>
+  Studiumkode: <input name="studiumkode"><br>
+  <button>Registrer</button>
 </form>
+
 <p><a href="index.php">Tilbake</a></p>
-</body>
-</html>
