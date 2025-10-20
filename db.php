@@ -1,21 +1,14 @@
-
 <?php
-/* db.php – kobler til databasen */
-
 $host = "b-studentsql-1.usn.no";
-$username = "faala0678";  // brukernavn
-$password = "23aafaala0678";  // passord
-$database = "faala0678";  // databasenavn
+$username = "faala0678";
+$password = "23aafaala0678";
+$database = "faala0678";
 
 $conn = new mysqli($host, $username, $password, $database);
-
-// sjekk tilkobling
 if ($conn->connect_error) {
-    die("Tilkoblingsfeil: " . $conn->connect_error);
+    die("<p style='color:red;'>❌ Tilkoblingsfeil: " . htmlspecialchars($conn->connect_error) . "</p>");
 }
-
-// valgfritt – for å teste at alt virker
-// echo "Koblet til databasen";
+?>
 
 
 
